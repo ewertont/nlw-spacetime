@@ -1,43 +1,43 @@
-import { useEffect } from 'react'
-import { useRouter } from 'expo-router'
-import { Text, TouchableOpacity, View } from 'react-native'
-import { makeRedirectUri, useAuthRequest } from 'expo-auth-session'
-import * as SecureStore from 'expo-secure-store'
+import { useEffect } from "react";
+import { useRouter } from "expo-router";
+import { Text, TouchableOpacity, View } from "react-native";
+import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
+import * as SecureStore from "expo-secure-store";
 
-import NLWLogo from '../src/assets/nlw-spacetime-logo.svg'
-import { api } from '../src/lib/api'
+import NLWLogo from "../src/assets/nlw-spacetime-logo.svg";
+import { api } from "../src/lib/api";
 
 const discovery = {
-  authorizationEndpoint: 'https://github.com/login/oauth/authorize',
-  tokenEndpoint: 'https://github.com/login/oauth/access_token',
+  authorizationEndpoint: "https://github.com/login/oauth/authorize",
+  tokenEndpoint: "https://github.com/login/oauth/access_token",
   revocationEndpoint:
-    'https://github.com/settings/connections/applications/d26f194cc5d5132a51be',
-}
+    "https://github.com/settings/connections/applications/d26f194cc5d5132a51be",
+};
 
 export default function App() {
-  const router = useRouter()
+  const router = useRouter();
 
   const [, response, signInWithGithub] = useAuthRequest(
     {
-      clientId: 'd26f194cc5d5132a51be',
-      scopes: ['identity'],
+      clientId: "d26f194cc5d5132a51be",
+      scopes: ["identity"],
       redirectUri: makeRedirectUri({
-        scheme: 'nlwspacetime',
+        scheme: "nlwspacetime",
       }),
     },
-    discovery,
-  )
+    discovery
+  );
 
   async function handleGithubOAuthCode(code: string) {
-    const response = await api.post('/register', {
+    const response = await api.post("/register", {
       code,
-    })
+    });
 
-    const { token } = response.data
+    const { token } = response.data;
 
-    await SecureStore.setItemAsync('token', token)
+    await SecureStore.setItemAsync("token", token);
 
-    router.push('/memories')
+    router.push("/memories");
   }
 
   useEffect(() => {
@@ -48,12 +48,12 @@ export default function App() {
     //   }),
     // )
 
-    if (response?.type === 'success') {
-      const { code } = response.params
+    if (response?.type === "success") {
+      const { code } = response.params;
 
-      handleGithubOAuthCode(code)
+      handleGithubOAuthCode(code);
     }
-  }, [response])
+  }, [response]);
 
   return (
     <View className="flex-1 items-center px-8 py-10">
@@ -85,5 +85,5 @@ export default function App() {
         Feito com 💜 no NLW da Rocketseat
       </Text>
     </View>
-  )
+  );
 }

@@ -6,35 +6,35 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native'
-import Icon from '@expo/vector-icons/Feather'
+} from "react-native";
+import Icon from "@expo/vector-icons/Feather";
 
-import NLWLogo from '../src/assets/nlw-spacetime-logo.svg'
-import { Link, useRouter } from 'expo-router'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useState } from 'react'
-import * as ImagePicker from 'expo-image-picker'
-import * as SecureStore from 'expo-secure-store'
-import { api } from '../src/lib/api'
+import NLWLogo from "../src/assets/nlw-spacetime-logo.svg";
+import { Link, useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
+import * as SecureStore from "expo-secure-store";
+import { api } from "../src/lib/api";
 
 export default function NewMemory() {
-  const { bottom, top } = useSafeAreaInsets()
-  const router = useRouter()
+  const { bottom, top } = useSafeAreaInsets();
+  const router = useRouter();
 
-  const [preview, setPreview] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string | null>(null);
 
-  const [content, setContent] = useState('')
-  const [isPublic, setIsPublic] = useState(false)
+  const [content, setContent] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
 
   async function openImagePicker() {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 1,
-      })
+      });
 
       if (result.assets[0]) {
-        setPreview(result.assets[0].uri)
+        setPreview(result.assets[0].uri);
       }
     } catch (err) {
       // deu erro mas eu não tratei
@@ -42,30 +42,30 @@ export default function NewMemory() {
   }
 
   async function handleCreateMemory() {
-    const token = await SecureStore.getItemAsync('token')
+    const token = await SecureStore.getItemAsync("token");
 
-    let coverUrl = ''
+    let coverUrl = "";
 
     if (preview) {
-      const uploadFormData = new FormData()
+      const uploadFormData = new FormData();
 
-      uploadFormData.append('file', {
+      uploadFormData.append("file", {
         uri: preview,
-        name: 'image.jpg',
-        type: 'image/jpg',
-      } as any)
+        name: "image.jpg",
+        type: "image/jpg",
+      } as any);
 
-      const uploadResponse = await api.post('/upload', uploadFormData, {
+      const uploadResponse = await api.post("/upload", uploadFormData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
-      })
+      });
 
-      coverUrl = uploadResponse.data.fileUrl
+      coverUrl = uploadResponse.data.fileUrl;
     }
 
     await api.post(
-      '/memories',
+      "/memories",
       {
         content,
         isPublic,
@@ -75,10 +75,10 @@ export default function NewMemory() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      },
-    )
+      }
+    );
 
-    router.push('/memories')
+    router.push("/memories");
   }
 
   return (
@@ -101,8 +101,8 @@ export default function NewMemory() {
           <Switch
             value={isPublic}
             onValueChange={setIsPublic}
-            trackColor={{ false: '#767577', true: '#372560' }}
-            thumbColor={isPublic ? '#9b79ea' : '#9e9ea0'}
+            trackColor={{ false: "#767577", true: "#372560" }}
+            thumbColor={isPublic ? "#9b79ea" : "#9e9ea0"}
           />
           <Text className="font-body text-base text-gray-200">
             Tornar memória pública
@@ -148,5 +148,5 @@ export default function NewMemory() {
         </TouchableOpacity>
       </View>
     </ScrollView>
-  )
+  );
 }
